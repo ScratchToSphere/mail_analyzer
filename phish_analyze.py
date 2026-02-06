@@ -849,15 +849,31 @@ Développé pour les équipes Blue Team - Threat Intelligence & Forensics
                 'tool': 'PhishAnalyze',
                 'version': '3.0',
                 'batch_mode': batch_mode,
-                'total_files': len(eml_files),
-                'virustotal_enabled': vt_client is not None,
-                'results': results
+                'last_update': time.strftime("%Y-%m-%d %H:%M:%S"),
+                'results': []
             }
+            
+            # Si le fichier existe déjà, charger les données existantes
+            if os.path.exists(args.json):
+                try:
+                    with open(args.json, 'r', encoding='utf-8') as f:
+                        existing_data = json.load(f)
+                        if 'results' in existing_data:
+                            output_data['results'] = existing_data['results']
+                except json.JSONDecodeError:
+                    # Si fichier corrompu ou vide, on repart de zéro
+                    pass
+            
+            # Ajouter les nouveaux résultats
+            # Optionnel: Éviter les doublons basés sur le nom de fichier et le hash
+            # Ici on ajoute simplement à la suite
+            output_data['results'].extend(results)
+            output_data['total_scanned'] = len(output_data['results'])
             
             with open(args.json, 'w', encoding='utf-8') as f:
                 json.dump(output_data, f, indent=2, ensure_ascii=False)
             
-            console.print(f"\n✅ Résultats exportés: {args.json}\n", style="bold green")
+            console.print(f"\n✅ Résultats ajoutés à: {args.json} (Total: {len(output_data['results'])})\n", style="bold green")
         except Exception as e:
             console.print(f"\n❌ Erreur export JSON: {str(e)}\n", style="bold red")
 
