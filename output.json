@@ -1,0 +1,73 @@
+{
+  "tool": "PhishAnalyze",
+  "version": "3.0",
+  "batch_mode": false,
+  "total_files": 1,
+  "virustotal_enabled": false,
+  "results": [
+    {
+      "file": "Sono arrivati i parcheggi Parclick.eml",
+      "headers": {
+        "From": "DropTicket <no-reply@comunicazioni.dropticket.it>",
+        "Reply-To": "no-reply@dropticket.com",
+        "Return-Path": "<bounces+2091674-2867-thomas.ovigny=gmail.com@abmail.comunicazioni.dropticket.it>",
+        "Subject": "Sono arrivati i parcheggi Parclick",
+        "Date": "Thu, 29 Jan 2026 09:30:58 +0000",
+        "Message-ID": "<Xar65YdqSLOVGzrQnfAWqQ@geopod-ismtpd-12>",
+        "X-Originating-IP": "N/A"
+      },
+      "authentication": {
+        "Authentication-Results": "mx.google.com;       dkim=pass header.i=@comunicazioni.dropticket.it header.s=s1 header.b=Vb76mV29;       dkim=pass header.i=@sendgrid.info header.s=smtpapi header.b=ns9R01CG;       spf=pass (google.com: domain of bounces+2091674-2867-thomas.ovigny=gmail.com@abmail.comunicazioni.dropticket.it designates 168.245.3.136 as permitted sender) smtp.mailfrom=\"bounces+2091674-2867-thomas.ovigny=gmail.com@abmail.comunicazioni.dropticket.it\";       dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=dropticket.it",
+        "SPF Status": "PASS",
+        "DKIM Status": "PASS",
+        "Received-SPF": "pass (google.com: domain of bounces+2091674-2867-thomas.ovigny=gmail.com@abmail.comunicazioni.dropticket.it designates 168.245.3.136 as permitted sender) client-ip=168.245.3.136;"
+      },
+      "route_ips": [
+        "168.245.3.136",
+        "01.29.03.21"
+      ],
+      "links": [
+        {
+          "visible_text": "(no text)",
+          "real_url": "",
+          "suspicious": false
+        },
+        {
+          "visible_text": "PRENOTA ORA",
+          "real_url": "https://ablink.comunicazioni.dropticket.it/ls/click?upn=u001.fm8NXYhcIM-2BWZDxg033FjAsEa9OadGQt0zOGCULE7xaW2S-2ByKQxqObs8iBg2P6MJKW3X_93BsojE-2BL5C-2BY5bA-2FpB2S28qs7AcF3r8xjd10uL8uKatNcooHU7KhtM1J435lOTvhaEBKILyKvtRgCLCxUT5vfV263CZ0HhjX3dx-2F7ihCxGsxzQpDC9F-2FqP67OlynNKVGMkjtvIDlMs6mNeLZdGk-2FtiK2TARotGYQZL39oLfDGPpfJGTC-2FPtxrHXN27IyYwPgbAohn0BFp6CpEICSBuiKD2jXMo-2BMN4VEvJXr23c1-2FyeK5E08ePbddkRt6k711bNMMI-2FzXaK1O6g0feA-2BJcnhmDNZlIMbGxCYqu7-2B6QoZswwBbVzRPD4J7dPtG1feYewW5cGbs3imDOnOnDn52N8q4slS-2FWxJqi-2FbvH4pKi0uYDp7zHIsyjkuUUjzDkCpW0N3w5N4xZxuJRzVV75NBzmVfyIMyJ3h6T6-2BllKJ16nGM0Vr8UKWknSKe9C0yfYg7inqLAtVTrTgcrjJM9nkhyslpujZCroDjSjkWweeUFw9hJP2Ng2mkQouaAsqfdbCJ9m4pXvS2TA1z2-2BSY1j4zVR23IICxR3xhU2kLxz-2B8WwIdNDYzo59igB7R9m2KozEKGCLM63EYpBTpAQiEDGuqX-2F7WSaVGG0PCfAqVkZ6Lk1P011skcjYvGLXXE4PsTytgpXO8-2B7EuDOD5Ymcef8-2FJRAnn8aiqJVJr0nx47Amk-2F5jnrLS889TMV-2B35jGbWptV8lH3Ga3B-2Bb49gNPEFO27Jlxow-3D-3D",
+          "suspicious": false
+        },
+        {
+          "visible_text": "Clicca qui",
+          "real_url": "https://ablink.comunicazioni.dropticket.it/ls/click?upn=u001.fm8NXYhcIM-2BWZDxg033FjKw7ArinxPms5hMkXi1FWRfgFz-2FQd3Vgck-2F6t63-2F51cpLsN2zrRqKJRLN0-2FcMXpJxDGxRsLjIQxt6jiGizvde2gXK-2Ft9qrnVPLeUPANa90skF2phXmkL794G9dFKQX0ni676lmDa3z-2F6R-2BM-2FuDNEpMFU-2FUB2bTrBieySFSxBedCjZjRPypocYuk9BFdAUbIZLYZnpIGhw2Cu8qS6ZZFVPrYDwpeR5iuuf8yqZ-2F5vWlwArGd9jvmd-2FdoDagm3Y7uapORT5xGgQgS0nj-2FXyDU6ND8hmOulWvaG4aDnh8owFs0uCbgpwselh0RjNepShbYEgVeQU7E2N8Onkj-2FAar0DEXoZii4-2BY8qf6LYNYYoIN-2FP2SeC7TWOE-2FJznWP65EUnYkJHsT9yiLMe3vmGRPKv2k6X-2BUgFi7aGM-2BjbBl5-2BYrWPaXfpSZnjQ7EhM8zmSF9tyE7PjQpikvTPDh4n-2BYgbhLRgpKwC35nK726LuaQU5q-2FIg3ObzbQSxFeQhuCBEI2GGTbZM1b7Q2TZkQ0YujxV5Wg1M8-2FsKbayrZNVdgO9z8wTq8kJ1sgNlq60ecAvmtY-2FU5SqPN456YLiAmsY2hUFdHsUNORjd04aVHpMM-2BQ-2Bozb4ZF3XP_93BsojE-2BL5C-2BY5bA-2FpB2S28qs7AcF3r8xjd10uL8uKatNcooHU7KhtM1J435lOTvhaEBKILyKvtRgCLCxUT5vfV263CZ0HhjX3dx-2F7ihCxGsxzQpDC9F-2FqP67OlynNKVGMkjtvIDlMs6mNeLZdGk-2FtiK2TARotGYQZL39oLfDGPpfJGTC-2FPtxrHXN27IyYwPgbAohn0BFp6CpEICSBuiKD2jXMo-2BMN4VEvJXr23c1-2FyeK5E08ePbddkRt6k711bNMMI-2FzXaK1O6g0feA-2BJcnhmDNZlIMbGxCYqu7-2B6QoZswwBbVzRPD4J7dPtG1feYewW5cGbs3imDOnOnDn52N8q4slS-2FWxJqi-2FbvH4pKi0uYDp7zHIsyjkuUUjzDkCpW0N3w5N4xZxuJRzVV75NBzmVfyIMyJ3h6T6-2BllKJ16nGM0Vr8UKWknSKe9C0yfYg7inqLAtVTrTgcrjJM9nkhyslpujZCroDjSjkWweeUFw9hJP2Ng2mkQouaAsqfdbCJ9m4pXvS2TA1z2-2BSY1j4zVR23IICxR3xhU2kLxz-2B8WwIdNDYzo59igB7R9m2KozEKGCM9IbdoJYr23RPPR7SVdcnP3dMT9QS3TP4SXrjp-2Bd7txLxCg9LfjMi81sQyY0RTWXvGpAGBA-2BlrF0zg4QOK9-2F7RI3qJSd19Oy-2BDdcEPGzU1aCyC9byOCzMaXsgXK-2FhNXqRdbsjnv7Ee4iNrVC-2BOY4fw-3D-3D",
+          "suspicious": false
+        },
+        {
+          "visible_text": "(no text)",
+          "real_url": "https://ablink.comunicazioni.dropticket.it/ls/click?upn=u001.fm8NXYhcIM-2BWZDxg033FjLejViSJwLYS43v87bDUAX0oEq981dQPxys1OtabPWcK7Sv2_93BsojE-2BL5C-2BY5bA-2FpB2S28qs7AcF3r8xjd10uL8uKatNcooHU7KhtM1J435lOTvhaEBKILyKvtRgCLCxUT5vfV263CZ0HhjX3dx-2F7ihCxGsxzQpDC9F-2FqP67OlynNKVGMkjtvIDlMs6mNeLZdGk-2FtiK2TARotGYQZL39oLfDGPpfJGTC-2FPtxrHXN27IyYwPgbAohn0BFp6CpEICSBuiKD2jXMo-2BMN4VEvJXr23c1-2FyeK5E08ePbddkRt6k711bNMMI-2FzXaK1O6g0feA-2BJcnhmDNZlIMbGxCYqu7-2B6QoZswwBbVzRPD4J7dPtG1feYewW5cGbs3imDOnOnDn52N8q4slS-2FWxJqi-2FbvH4pKi0uYDp7zHIsyjkuUUjzDkCpW0N3w5N4xZxuJRzVV75NBzmVfyIMyJ3h6T6-2BllKJ16nGM0Vr8UKWknSKe9C0yfYg7inqLAtVTrTgcrjJM9nkhyslpujZCroDjSjkWweeUFw9hJP2Ng2mkQouaAsqfdbCJ9m4pXvS2TA1z2-2BSY1j4zVR23IICxR3xhU2kLxz-2B8WwIdNDYzo59igB7R9m2KozEKGCYNwQx5O7KelKuZEWll9Mbd2BAEgXbNC715K0b3h1ZvdkgjxrH0qqBXI3CX-2BfmEYbKWbgPLnpKz58U6GOzV1f7D3lSb6rg3FTsRhxgGcykHyEoKLwqiwsIXMxGhOq89lBjoHgPRRA1jVQQED7D-2BLjpg-3D-3D",
+          "suspicious": false
+        },
+        {
+          "visible_text": "(no text)",
+          "real_url": "https://ablink.comunicazioni.dropticket.it/ls/click?upn=u001.fm8NXYhcIM-2BWZDxg033FjOFyM8PZbSnwhnTUeSwU4LJe3xgdFbXu3VcrfK-2BGuf-2BGSxFV_93BsojE-2BL5C-2BY5bA-2FpB2S28qs7AcF3r8xjd10uL8uKatNcooHU7KhtM1J435lOTvhaEBKILyKvtRgCLCxUT5vfV263CZ0HhjX3dx-2F7ihCxGsxzQpDC9F-2FqP67OlynNKVGMkjtvIDlMs6mNeLZdGk-2FtiK2TARotGYQZL39oLfDGPpfJGTC-2FPtxrHXN27IyYwPgbAohn0BFp6CpEICSBuiKD2jXMo-2BMN4VEvJXr23c1-2FyeK5E08ePbddkRt6k711bNMMI-2FzXaK1O6g0feA-2BJcnhmDNZlIMbGxCYqu7-2B6QoZswwBbVzRPD4J7dPtG1feYewW5cGbs3imDOnOnDn52N8q4slS-2FWxJqi-2FbvH4pKi0uYDp7zHIsyjkuUUjzDkCpW0N3w5N4xZxuJRzVV75NBzmVfyIMyJ3h6T6-2BllKJ16nGM0Vr8UKWknSKe9C0yfYg7inqLAtVTrTgcrjJM9nkhyslpujZCroDjSjkWweeUFw9hJP2Ng2mkQouaAsqfdbCJ9m4pXvS2TA1z2-2BSY1j4zVR23IICxR3xhU2kLxz-2B8WwIdNDYzo59igB7R9m2KozEKGCI4m0-2Bw2r9gDm91DBSN5ryXDVCF3BSLcd6IlDutg-2FBuUhdt722sb-2Bv-2FCJtcxMrHbpgrCxBCzUIKSXaROYfDTDFLi-2BHSEyQTV9mnV22-2FQu8hS9FmdTXfgPbt8aJUFV8u1fUlODASuQmfFAKPf9tb92jQ-3D-3D",
+          "suspicious": false
+        },
+        {
+          "visible_text": "(no text)",
+          "real_url": "https://ablink.comunicazioni.dropticket.it/ls/click?upn=u001.fm8NXYhcIM-2BWZDxg033FjFGTAbMw8YsPqEOoufhLP4E1hVY85JiDZx0YHItJrD17d9ug_93BsojE-2BL5C-2BY5bA-2FpB2S28qs7AcF3r8xjd10uL8uKatNcooHU7KhtM1J435lOTvhaEBKILyKvtRgCLCxUT5vfV263CZ0HhjX3dx-2F7ihCxGsxzQpDC9F-2FqP67OlynNKVGMkjtvIDlMs6mNeLZdGk-2FtiK2TARotGYQZL39oLfDGPpfJGTC-2FPtxrHXN27IyYwPgbAohn0BFp6CpEICSBuiKD2jXMo-2BMN4VEvJXr23c1-2FyeK5E08ePbddkRt6k711bNMMI-2FzXaK1O6g0feA-2BJcnhmDNZlIMbGxCYqu7-2B6QoZswwBbVzRPD4J7dPtG1feYewW5cGbs3imDOnOnDn52N8q4slS-2FWxJqi-2FbvH4pKi0uYDp7zHIsyjkuUUjzDkCpW0N3w5N4xZxuJRzVV75NBzmVfyIMyJ3h6T6-2BllKJ16nGM0Vr8UKWknSKe9C0yfYg7inqLAtVTrTgcrjJM9nkhyslpujZCroDjSjkWweeUFw9hJP2Ng2mkQouaAsqfdbCJ9m4pXvS2TA1z2-2BSY1j4zVR23IICxR3xhU2kLxz-2B8WwIdNDYzo59igB7R9m2KozEKGCz6U3cLkhbq-2BMoZdo1yX8JKBILNaBSjXZ6gzrkJKIvOD3G3-2FjNuvojtje7Jj03wlFH8z4Al5yGRl3fVvZVe1v4gdzAJJs8-2BApxfqS-2FlXC68DZv14kITNMrUW814hOvAM357eE2aMLIvqnFBlseTv7TA-3D-3D",
+          "suspicious": false
+        }
+      ],
+      "attachments": [],
+      "alerts": [
+        {
+          "level": "WARNING",
+          "type": "Potential Spoofing",
+          "message": "From (no-reply@comunicazioni.dropticket.it) ≠ Reply-To (no-reply@dropticket.com)"
+        }
+      ],
+      "severity": "WARNING",
+      "alert_count": 1
+    }
+  ]
+}

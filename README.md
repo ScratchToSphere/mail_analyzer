@@ -1,6 +1,6 @@
 # PhishAnalyze - SOC Email Threat Intelligence Tool
 
-![Version](https://img.shields.io/badge/version-2.0-blue.svg)
+![Version](https://img.shields.io/badge/version-3.0-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.8+-green.svg)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg)
 
@@ -10,16 +10,32 @@ Analysez les emails suspects (.eml) avec des fonctionnalités de détection de p
 
 ---
 
-## 🚀 Fonctionnalités SOC
+## 🚀 Fonctionnalités v3.0 (Enterprise)
+
+### 🏭 Industrialisation
+- **Mode Batch** : Analyse automatique d'un dossier complet de fichiers .eml
+- **Barre de progression** : Suivi visuel de l'avancement
+- **Tableau récapitulatif** : Vue d'ensemble des menaces détectées dans le lot
+
+### 🦠 Threat Intelligence
+- **Intégration VirusTotal** : Vérification automatique des hashs de fichiers
+- **Score de détection** : Affichage du ratio de détection (ex: `35/60`)
+- **Gestion des Quotas** : Respect des limites API (4 req/min)
+
+### 📤 Interopérabilité
+- **Export JSON** : Sauvegarde des résultats structurés pour intégration SIEM/SOAR
+
+---
+
+## 🛡️ Fonctionnalités de Sécurité (Core)
 
 ### 📩 Section 1: ENVELOPPE
 - **Méta-données complètes** : From, Reply-To, Return-Path, Subject, Date, Message-ID, X-Originating-IP
 - **Authentification Email** :
   - ✅ Vérification **SPF** (Sender Policy Framework)
   - ✅ Vérification **DKIM** (DomainKeys Identified Mail)
-  - ✅ Analyse **Authentication-Results**
   - 🔴 **Alertes CRITIQUES** si SPF/DKIM échouent
-- **Route Tracking** : Extraction de toutes les IPs des headers `Received` avec identification de la source probable
+- **Route Tracking** : Extraction de toutes les IPs des headers `Received`
 
 ### ⚠️ Section 2: ALERTES DE SÉCURITÉ
 - **Détection de Spoofing** : Compare `From` vs `Reply-To` (🟡 alerte JAUNE si différent)
@@ -29,17 +45,14 @@ Analysez les emails suspects (.eml) avec des fonctionnalités de détection de p
 
 ### 🔗 Section 3: ANALYSE DES URLs
 - **Parsing HTML avancé** avec BeautifulSoup4
-- Extraction des liens `<a href="...">` avec :
-  - Texte visible (anchor text)
-  - URL de destination réelle
-  - **Détection d'homograph attacks** (texte montre google.com mais pointe vers evil.com)
+- Extraction des liens `<a href="...">` avec détection d'homograph attacks
 - **Defanging automatique** : `http` → `hxxp`, `.` → `[.]` (sécurité)
 
 ### 📎 Section 4: PIÈCES JOINTES
-- Nom du fichier
-- **Détection de doubles extensions** (.pdf.exe → 🔴 ALERTE)
+- Nom du fichier et détection de doubles extensions
 - **Taille en Ko**
-- **Hash SHA256** (pour IOC / Threat Intelligence)
+- **Hash SHA256**
+- **Score VirusTotal** (si activé)
 
 ---
 
@@ -51,213 +64,102 @@ Analysez les emails suspects (.eml) avec des fonctionnalités de détection de p
 
 ### Dépendances
 ```bash
-pip install rich beautifulsoup4
+pip install rich beautifulsoup4 requests
 ```
 
 ---
 
 ## 🎯 Utilisation
 
-### Syntaxe de base
+### Mode Fichier Unique
 ```bash
-python phish_analyze.py <fichier.eml>
+python phish_analyze.py suspicious_email.eml
 ```
 
-### Exemples
+### Mode Batch (Dossier)
+Analyse tous les fichiers `.eml` d'un répertoire :
 ```bash
-# Analyse simple
-python phish_analyze.py suspicious_email.eml
+python phish_analyze.py ./dossier_emails
+```
 
-# Avec chemin complet (Windows)
-python phish_analyze.py "C:\Emails\phishing_attempt.eml"
+### Options Avancées
 
-# Avec chemin contenant des espaces
-python phish_analyze.py "Sono arrivati i parcheggi Parclick.eml"
+#### Activer VirusTotal
+Nécessite une clé API définie dans la variable d'environnement `VT_API_KEY`.
+```bash
+set VT_API_KEY=votre_cle_api_virustotal
+python phish_analyze.py email.eml --vt
+```
 
-# Afficher l'aide
-python phish_analyze.py --help
+#### Export JSON
+Pour intégration avec d'autres outils :
+```bash
+python phish_analyze.py email.eml --json resultat.json
 ```
 
 ---
 
-## 📊 Exemple de Sortie (Dashboard)
+## 📊 Exemples de Sortie
 
+### Dashboard Console (Single Mode)
 ```
 ┌──────────────────────────────────────────────────────────┐
-│ 🔍 PhishAnalyze - SOC Email Threat Intelligence Tool    │
-│ Advanced Forensic Analysis for Blue Team Operations     │
+│ 🔍 PhishAnalyze v3.0 - SOC Email Threat Intelligence    │
 └──────────────────────────────────────────────────────────┘
 
-✅ Email parsé avec succès
-
 ╔═══════════════════════════════════════════════════════════╗
-║         📩 ENVELOPPE - Méta-données Email                ║
+║                  📎 PIÈCES JOINTES                        ║
 ╠═══════════════════════════════════════════════════════════╣
-║ From          │ suspicious@example.com                    ║
-║ Reply-To      │ attacker@evil.com                         ║
-║ Subject       │ Urgent: Verify Your Account              ║
-╚═══════════════════════════════════════════════════════════╝
-
-╔═══════════════════════════════════════════════════════════╗
-║                  🔐 AUTHENTIFICATION                      ║
-╠═══════════════════════════════════════════════════════════╣
-║ SPF Status    │ FAIL                                      ║
-║ DKIM Status   │ FAIL                                      ║
-╚═══════════════════════════════════════════════════════════╝
-
-╔═══════════════════════════════════════════════════════════╗
-║              ⚠️ ALERTES DE SÉCURITÉ                       ║
-╠═══════════════════════════════════════════════════════════╣
-║ 🔴 CRITICAL   │ SPF Failure    │ Email may be spoofed    ║
-║ 🟡 WARNING    │ Spoofing       │ From ≠ Reply-To         ║
+║ Nom         │ Extension(s)  │ VT Score    │ SHA256       ║
+║ malware.exe │ .exe ⚠️       │ 🔴 45/60    │ a3b2c1d...   ║
 ╚═══════════════════════════════════════════════════════════╝
 ```
 
----
-
-## 🛡️ Cas d'Usage SOC
-
-### 1. Investigation de Phishing
-```bash
-# Analyser un email suspect signalé par un utilisateur
-python phish_analyze.py reported_phishing.eml
+### Tableau Récapitulatif (Batch Mode)
 ```
-**Résultat** : Détection automatique de SPF fail, liens trompeurs, et pièces jointes suspectes.
-
-### 2. Threat Intelligence
-```bash
-# Extraire les IOCs (hash SHA256, IPs, domaines)
-python phish_analyze.py malware_campaign.eml
+          📊 RÉCAPITULATIF BATCH          
+┌────────────┬──────────────┬────────────┬──────────────┐
+│ Fichier    │ Sévérité     │ Alertes    │ VT Détections│
+├────────────┼──────────────┼────────────┼──────────────┤
+│ email1.eml │ 🟡 WARNING   │ 1          │ 0            │
+│ email2.eml │ 🔴 CRITICAL  │ 3          │ 🔴 28        │
+└────────────┴──────────────┴────────────┴──────────────┘
 ```
-**Résultat** : Hash SHA256 des pièces jointes pour recherche VirusTotal, IPs pour blocage firewall.
-
-### 3. Formation Blue Team
-```bash
-# Démonstration des techniques de phishing
-python phish_analyze.py training_sample.eml
-```
-**Résultat** : Visualisation claire des indicateurs de compromission.
 
 ---
 
 ## 🔍 Détails Techniques
 
-### Architecture
-- **Orienté Objet** : Classe `EmailAnalyzer` avec méthodes modulaires
-- **Gestion d'erreurs** : Try/except sur parsing, encodages, extraction
-- **Encodage robuste** : Support UTF-8 pour Windows (emojis, caractères spéciaux)
+### API VirusTotal & Quotas
+L'outil respecte automatiquement les quotas de l'API gratuite VT (4 requêtes/minute) en ajoutant une pause de 15s entre chaque requête si nécessaire.
 
-### Librairies Utilisées
-| Librairie | Usage |
-|-----------|-------|
-| `email` (stdlib) | Parsing .eml (MIME, headers, multipart) |
-| `rich` | Interface terminal (tableaux, panels, couleurs) |
-| `beautifulsoup4` | Parsing HTML (extraction liens, détection spoofing) |
-| `hashlib` (stdlib) | Calcul SHA256 des pièces jointes |
-| `re` (stdlib) | Regex (extraction IPs, URLs, emails) |
-
-### Détection de Menaces
-
-#### 1. Spoofing Detection
-```python
-# Compare From vs Reply-To
-if from_email != reply_to_email:
-    🟡 WARNING: Potential Spoofing
-```
-
-#### 2. Authentication Failure
-```python
-# Analyse SPF/DKIM
-if 'fail' in spf_result.lower():
-    🔴 CRITICAL: SPF check FAILED
-```
-
-#### 3. Deceptive Links
-```python
-# BeautifulSoup parsing
-<a href="http://evil.com">http://google.com</a>
-    ↓
-🟡 WARNING: Link text shows "google.com" but points to "evil.com"
-```
-
-#### 4. Dangerous Attachments
-```python
-# Détection doubles extensions
-filename = "invoice.pdf.exe"
-    ↓
-🔴 CRITICAL: Double extension detected (possible malware)
-```
-
----
-
-## 📝 Format .eml
-
-Le script accepte uniquement les fichiers `.eml` (RFC 822 email format).
-
-### Comment obtenir un .eml ?
-- **Outlook** : Fichier → Enregistrer sous → Format .eml
-- **Gmail** : Télécharger le message → "Afficher l'original" → Enregistrer
-- **Thunderbird** : Clic droit → Enregistrer comme → .eml
-
----
-
-## 🎨 Personnalisation
-
-### Modifier les alertes
-Éditez la classe `EmailAnalyzer` pour ajouter vos propres règles :
-
-```python
-# Exemple: Ajouter une alerte pour domaine suspect
-if 'suspicious-domain.com' in from_addr:
-    self.security_alerts.append({
-        'level': 'CRITICAL',
-        'type': 'Blacklisted Domain',
-        'message': 'Email from known malicious domain'
-    })
-```
-
-### Exporter les résultats
-Ajoutez une méthode pour exporter en JSON :
-
-```python
-def export_json(self, output_file):
-    import json
-    data = {
-        'headers': self.extract_envelope_headers(),
-        'alerts': self.security_alerts,
-        'attachments': self.extract_attachments()
+### Structure JSON
+```json
+{
+  "tool": "PhishAnalyze",
+  "version": "3.0",
+  "results": [
+    {
+      "file": "email.eml",
+      "severity": "CRITICAL",
+      "alerts": [
+        { "level": "CRITICAL", "type": "SPF Failure", "message": "..." }
+      ],
+      "attachments": [
+        {
+          "filename": "malware.exe",
+          "sha256": "...",
+          "vt_results": { "malicious": 45, "total": 60 }
+        }
+      ]
     }
-    with open(output_file, 'w') as f:
-        json.dump(data, f, indent=2)
-```
-
----
-
-## 🐛 Dépannage
-
-### Erreur: `ModuleNotFoundError: No module named 'rich'`
-```bash
-pip install rich
-```
-
-### Erreur: `ModuleNotFoundError: No module named 'bs4'`
-```bash
-pip install beautifulsoup4
-```
-
-### Problème d'encodage (Windows)
-Le script configure automatiquement UTF-8 pour Windows. Si vous rencontrez des problèmes :
-```bash
-# Forcer UTF-8 dans le terminal
-chcp 65001
-python phish_analyze.py email.eml
+  ]
+}
 ```
 
 ---
 
 ## 🤝 Contribution
-
-Les contributions sont les bienvenues ! Pour ajouter des fonctionnalités :
 
 1. Fork le projet
 2. Créez une branche (`git checkout -b feature/nouvelle-detection`)
@@ -270,38 +172,4 @@ Les contributions sont les bienvenues ! Pour ajouter des fonctionnalités :
 ## 📄 Licence
 
 MIT License - Libre d'utilisation pour les équipes Blue Team et SOC.
-
----
-
-## 🔗 Ressources
-
-- [RFC 5322 - Internet Message Format](https://tools.ietf.org/html/rfc5322)
-- [SPF (RFC 7208)](https://tools.ietf.org/html/rfc7208)
-- [DKIM (RFC 6376)](https://tools.ietf.org/html/rfc6376)
-- [DMARC (RFC 7489)](https://tools.ietf.org/html/rfc7489)
-- [MITRE ATT&CK - Phishing](https://attack.mitre.org/techniques/T1566/)
-
----
-
-## 👨‍💻 Auteur
-
-**Senior Security Engineer** - Développé pour les équipes Blue Team
-
-**Version**: 2.0 (SOC Edition)  
-**Date**: 2026-02-06
-
----
-
-## 🎯 Roadmap
-
-- [ ] Export JSON/CSV des résultats
-- [ ] Intégration VirusTotal API (hash lookup)
-- [ ] Détection de typosquatting (domaines similaires)
-- [ ] Analyse DMARC avancée
-- [ ] Support .msg (Outlook)
-- [ ] Mode batch (analyser plusieurs .eml)
-- [ ] Génération de rapports PDF
-
----
-
-**⚠️ Disclaimer** : Cet outil est destiné à l'analyse forensique d'emails suspects dans un cadre légal (SOC, Blue Team). Ne l'utilisez pas pour des activités illégales.
+Developed by Senior Security Engineer.
