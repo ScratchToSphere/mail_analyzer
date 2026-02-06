@@ -1,6 +1,6 @@
 # PhishAnalyze - SOC Email Threat Intelligence Tool
 
-![Version](https://img.shields.io/badge/version-3.0-blue.svg)
+![Version](https://img.shields.io/badge/version-3.1-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.8+-green.svg)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg)
 
@@ -10,15 +10,16 @@ Analysez les emails suspects (.eml) avec des fonctionnalités de détection de p
 
 ---
 
-## 🚀 Fonctionnalités v3.0 (Enterprise)
+## 🚀 Fonctionnalités v3.1 (Enterprise)
 
 ### 🏭 Industrialisation
 - **Mode Batch** : Analyse automatique d'un dossier complet de fichiers .eml
 - **Barre de progression** : Suivi visuel de l'avancement
 - **Tableau récapitulatif** : Vue d'ensemble des menaces détectées dans le lot
 
-### 🦠 Threat Intelligence
-- **Intégration VirusTotal** : Vérification automatique des hashs de fichiers
+### 🦠 Threat Intelligence & Réputation
+- **Intégration VirusTotal** : Vérification des hashs de fichiers et des **Adresses IP**.
+- **Smart Filter** : Ignore automatiquement les IPs privées (192.168.x) et locales pour économiser les quotas.
 - **Score de détection** : Affichage du ratio de détection (ex: `35/60`)
 - **Gestion des Quotas** : Respect des limites API (4 req/min)
 
@@ -35,7 +36,12 @@ Analysez les emails suspects (.eml) avec des fonctionnalités de détection de p
   - ✅ Vérification **SPF** (Sender Policy Framework)
   - ✅ Vérification **DKIM** (DomainKeys Identified Mail)
   - 🔴 **Alertes CRITIQUES** si SPF/DKIM échouent
-- **Route Tracking** : Extraction de toutes les IPs des headers `Received`
+- **Route Tracking** : Extraction de toutes les IPs des headers `Received` et du corps du mail.
+
+### 🌍 Section 1.5: NETWORK REPUTATION (Nouveau v3.1)
+- Analyse de réputation des IPs publiques détectées via VirusTotal.
+- Affichage : IP, Pays (GeoIP), Propriétaire (AS), et Score de malveillance.
+- **Filtrage Intelligent** : Ne scanne que les IP Publiques.
 
 ### ⚠️ Section 2: ALERTES DE SÉCURITÉ
 - **Détection de Spoofing** : Compare `From` vs `Reply-To` (🟡 alerte JAUNE si différent)
@@ -104,8 +110,16 @@ python phish_analyze.py email.eml --json resultat.json
 ### Dashboard Console (Single Mode)
 ```
 ┌──────────────────────────────────────────────────────────┐
-│ 🔍 PhishAnalyze v3.0 - SOC Email Threat Intelligence    │
+│ 🔍 PhishAnalyze v3.1 - SOC Email Threat Intelligence    │
 └──────────────────────────────────────────────────────────┘
+
+╔═══════════════════════════════════════════════════════════╗
+║                  🌍 NETWORK REPUTATION                    ║
+╠═══════════════════════════════════════════════════════════╣
+║ IP Address  │ Country │ Owner (AS)       │ Score │ Status ║
+║ 8.8.8.8     │ US      │ GOOGLE           │ 0/88  │ CLEAN  ║
+║ 185.x.x.x   │ RU      │ EVIL-CORP        │ 12/88 │ MALICIOUS ║
+╚═══════════════════════════════════════════════════════════╝
 
 ╔═══════════════════════════════════════════════════════════╗
 ║                  📎 PIÈCES JOINTES                        ║
@@ -172,4 +186,4 @@ L'outil respecte automatiquement les quotas de l'API gratuite VT (4 requêtes/mi
 ## 📄 Licence
 
 MIT License - Libre d'utilisation pour les équipes Blue Team et SOC.
-Developed by Senior Security Engineer.
+Developed by ScratchToSphere.

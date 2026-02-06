@@ -24,6 +24,7 @@ from email.parser import BytesParser
 from pathlib import Path
 from typing import List, Dict, Optional, Tuple, Any
 from urllib.parse import urlparse
+import ipaddress
 
 # Configuration de l'encodage UTF-8 pour Windows
 if sys.platform == 'win32':
@@ -114,6 +115,54 @@ class VirusTotalClient:
         except Exception as e:
             return {'error': f'Unexpected error: {str(e)}'}
 
+    def check_ip(self, ip_address: str) -> Optional[Dict[str, Any]]:
+        """
+        Interroge VirusTotal pour une adresse IP.
+        
+        Args:
+            ip_address (str): Adresse IP à vérifier
+            
+        Returns:
+            Optional[Dict]: Résultats VT ou None si erreur
+        """
+        if not self.is_configured():
+            return None
+        
+        # Gestion des quotas
+        elapsed = time.time() - self.last_request_time
+        if elapsed < 15:
+            wait_time = 15 - elapsed
+            time.sleep(wait_time)
+            
+        try:
+            headers = {'x-apikey': self.api_key}
+            url = f'{self.base_url}/ip_addresses/{ip_address}'
+            
+            response = requests.get(url, headers=headers, timeout=10)
+            self.last_request_time = time.time()
+            
+            if response.status_code == 200:
+                data = response.json()
+                attrs = data.get('data', {}).get('attributes', {})
+                stats = attrs.get('last_analysis_stats', {})
+                
+                return {
+                    'ip': ip_address,
+                    'country': attrs.get('country', 'Unknown'),
+                    'as_owner': attrs.get('as_owner', 'Unknown'),
+                    'malicious': stats.get('malicious', 0),
+                    'suspicious': stats.get('suspicious', 0),
+                    'total': sum(stats.values()) if stats else 0,
+                    'error': None
+                }
+            elif response.status_code == 404:
+                return {'ip': ip_address, 'error': 'IP not found in VT'}
+            else:
+                return {'ip': ip_address, 'error': f'API error {response.status_code}'}
+                
+        except Exception as e:
+            return {'ip': ip_address, 'error': str(e)}
+
 
 class EmailAnalyzer:
     """
@@ -160,6 +209,7 @@ class EmailAnalyzer:
         
         # Données extraites (pour export JSON)
         self.analysis_data = {}
+        self.network_reputation = []
         
         self._validate_file()
         
@@ -259,6 +309,74 @@ class EmailAnalyzer:
                 unique_ips.append(ip)
         
         return unique_ips
+        
+    def extract_ips_from_body(self) -> List[str]:
+        """Extrait les IP du corps du message."""
+        ips = []
+        ip_pattern = re.compile(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b')
+        
+        content = ""
+        if self.email_message.is_multipart():
+            for part in self.email_message.walk():
+                if part.get_content_type() == 'text/plain':
+                    try:
+                        content += part.get_content()
+                    except: pass
+        else:
+            try:
+                content = self.email_message.get_content()
+            except: pass
+            
+        return list(set(ip_pattern.findall(content)))
+
+    def analyze_network_reputation(self, ips: List[str]) -> List[Dict[str, Any]]:
+        """
+        Analyse la réputation des IPs publiques via VirusTotal.
+        Filtre les IPs privées/réservées pour économiser les quotas.
+        """
+        results = []
+        checked_ips = set()
+        
+        for ip in ips:
+            # Nettoyage préa-lable (ex: 02.04.03.52 -> 2.4.3.52 pour éviter erreur octale)
+            try:
+                if '.' in ip:
+                    clean_ip = '.'.join(str(int(part)) for part in ip.split('.') if part.isdigit())
+                    # Vérifier qu'on a toujours 4 parties
+                    if len(clean_ip.split('.')) != 4:
+                        clean_ip = ip
+                else:
+                    clean_ip = ip
+            except:
+                clean_ip = ip
+
+            if clean_ip in checked_ips:
+                continue
+            checked_ips.add(clean_ip)
+            
+            try:
+                ip_obj = ipaddress.ip_address(clean_ip)
+                # Smart Filter: Ignorer IPs privées, loopback, link-local, multicast
+                if not ip_obj.is_global or ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_reserved or ip_obj.is_multicast:
+                    continue
+                
+                # Check VT si activé
+                if self.vt_client and self.vt_client.is_configured():
+                    vt_res = self.vt_client.check_ip(clean_ip)
+                    if vt_res:
+                        # Alerte si malveillant
+                        if vt_res.get('malicious', 0) > 0:
+                            self.security_alerts.append({
+                                'level': 'CRITICAL',
+                                'type': 'Malicious IP',
+                                'message': f"IP {ip} flagged by {vt_res['malicious']} vendors ({vt_res.get('country')})"
+                            })
+                        results.append(vt_res)
+                        
+            except ValueError:
+                continue # IP invalide
+                
+        return results
     
     def detect_spoofing(self, headers: Dict[str, str]) -> None:
         """Détecte les tentatives de spoofing en comparant From et Reply-To."""
@@ -429,6 +547,7 @@ class EmailAnalyzer:
             'headers': self.analysis_data.get('headers', {}),
             'authentication': self.analysis_data.get('authentication', {}),
             'route_ips': self.analysis_data.get('route_ips', []),
+            'network_reputation': self.network_reputation,
             'links': self.analysis_data.get('links', []),
             'attachments': self.analysis_data.get('attachments', []),
             'alerts': self.security_alerts,
@@ -453,6 +572,12 @@ class EmailAnalyzer:
         envelope_headers = self.extract_envelope_headers()
         auth_results = self.check_authentication()
         route_ips = self.extract_route_ips()
+        body_ips = self.extract_ips_from_body()
+        
+        # Combiner toutes les IPs pour analyse réputation
+        all_ips = route_ips + body_ips
+        self.network_reputation = self.analyze_network_reputation(all_ips)
+        
         self.detect_spoofing(envelope_headers)
         html_links = self.extract_html_links()
         attachments = self.extract_attachments()
@@ -468,15 +593,15 @@ class EmailAnalyzer:
         
         # Affichage si demandé (pas en mode batch)
         if display and not self.batch_mode:
-            self._display_full_report(envelope_headers, auth_results, route_ips, html_links, attachments)
+            self._display_full_report(envelope_headers, auth_results, route_ips, html_links, attachments, self.network_reputation)
         
         return self.to_dict()
     
-    def _display_full_report(self, headers, auth, ips, links, attachments):
+    def _display_full_report(self, headers, auth, ips, links, attachments, net_rep):
         """Affiche le rapport complet (mode non-batch)."""
         # Banner
         self.console.print(Panel.fit(
-            "[bold cyan]🔍 PhishAnalyze v3.0 - SOC Email Threat Intelligence Tool[/bold cyan]\n"
+            "[bold cyan]🔍 PhishAnalyze v3.1 - SOC Email Threat Intelligence Tool[/bold cyan]\n"
             "[yellow]Advanced Forensic Analysis for Blue Team Operations[/yellow]",
             border_style="cyan"
         ))
@@ -485,6 +610,10 @@ class EmailAnalyzer:
         
         # Section 1: Enveloppe
         self._display_envelope(headers, auth, ips)
+        
+        # Section 1.5: Network Reputation (si activé)
+        if net_rep:
+            self._display_network_reputation(net_rep)
         
         # Section 2: Alertes
         self._display_security_alerts()
@@ -553,6 +682,39 @@ class EmailAnalyzer:
             self.console.print(ip_table)
             self.console.print()
     
+    def _display_network_reputation(self, reputation):
+        """Affiche la réputation réseau."""
+        table = Table(title="🌍 NETWORK REPUTATION", box=box.DOUBLE, show_header=True, header_style="bold cyan")
+        table.add_column("IP Address", style="white")
+        table.add_column("Country", style="cyan")
+        table.add_column("Owner (AS)", style="blue", overflow="fold")
+        table.add_column("Score", style="white")
+        table.add_column("Status", style="bold")
+        
+        for item in reputation:
+            ip = item['ip']
+            if 'error' in item and item['error']:
+                table.add_row(ip, "N/A", "N/A", "N/A", f"[red]{item['error']}[/red]")
+                continue
+                
+            country = item.get('country', 'UNK')
+            owner = item.get('as_owner', 'UNK')
+            malicious = item.get('malicious', 0)
+            total = item.get('total', 0)
+            
+            score_str = f"{malicious}/{total}"
+            if malicious > 0:
+                score_str = f"[bold red]{score_str}[/bold red]"
+                status = "[bold red]MALICIOUS[/bold red]"
+            else:
+                score_str = f"[green]{score_str}[/green]"
+                status = "[green]CLEAN[/green]"
+            
+            table.add_row(ip, country, owner, score_str, status)
+            
+        self.console.print(table)
+        self.console.print()
+
     def _display_security_alerts(self):
         """Affiche les alertes de sécurité."""
         if not self.security_alerts:
@@ -687,7 +849,7 @@ Exemples d'utilisation:
   # Dossier (mode batch)
   python phish_analyze.py ./emails_folder
   
-  # Avec VirusTotal
+  # Avec VirusTotal (Attachments + IPs)
   python phish_analyze.py email.eml --vt
   
   # Export JSON
@@ -696,9 +858,10 @@ Exemples d'utilisation:
   # Mode complet
   python phish_analyze.py ./emails --vt --json report.json
 
-Fonctionnalités v3.0:
+Fonctionnalités v3.1:
   ✓ Mode Batch (dossier)
-  ✓ Intégration VirusTotal API
+  ✓ Intégration VirusTotal API (File Hash + IP Reputation)
+  ✓ Smart IP Filter (Private/Reserved ignored)
   ✓ Export JSON
   ✓ Gestion quotas API (4 req/min)
   ✓ Authentification (SPF, DKIM, DMARC)
